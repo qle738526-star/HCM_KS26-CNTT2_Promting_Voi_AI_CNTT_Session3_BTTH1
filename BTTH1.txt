@@ -1,0 +1,64 @@
+﻿Sử dụng khung cấu trúc CREATE:
+C - Context: Đóng vai trò là Chuyên viên xử lý dữ liệu nhân sự cấp cao.
+R - Request: Trích xuất các trường thông tin: Họ và  tên, Số điện thoại, Email, Vị trí ứng tuyển, năm kinh nghiệm, Kỹ năng chính. Trả về một bảng markdown và một mảng JSON.
+E - Explanation: Dữ liệu này sẽ dùng để import trực tiếp vào database tuyển dụng nên cần độ chính xác 100%.
+A - Action: Quét qua email thô, xác định đúng các trường thông tin, phân loại kỹ năng thành một danh sách.
+* Họ tên: Chuyển về dạng viết hoa chữ cái đầu (ví dụ Nguyễn Văn A, Nguyễn Văn B)
+* Số điện thoại: Chuẩn hóa về định dạng đầu số quốc gia hoặc loại bỏ dấu cách dư thừa.(ví dụ 0912345678…)
+* Kỹ năng chính: Gom nhóm thành một danh sách không trùng lặp 
+* Không được tự ý thêm thắt hoặc ảo giác các thông tin không có trong email của ứng viên.
+* Nếu thông tin nào bị thiếu (ví dụ không ghi số điện thoại), phải để giá trị là null trong JSON, không được tự điền bừa.
+* Chỉ trả về dữ liệu kết quả, nghiêm cấm AI viết thêm các đoạn văn giải thích ở đầu hoặc cuối câu trả lời.
+ 
+T - Tone: Chính xác, khách quan, không thêm thắt văn phong cảm xúc.
+E - Extras: Tuân thủ chính xác định dạng đầu ra theo 2 ví dụ Few-shot mẫu (cặp dữ liệu Input email thô -> Output mong muốn) 
+Ví dụ 1:
+ Input: "nguyễn văn a ứng tuyển Frontend Developer. 3 năm kinh nghiệm ReactJS, HTML, CSS. SĐT 091 234 5678, email a.nguyen@gmail.com" 
+Output:
+Markdown:
+| Trường thông tin | Giá trị |
+| --- | --- |
+| Họ tên | Nguyễn Văn A |
+| Số điện thoại | 0912345678 |
+| Email | a.nguyen@gmail.com |
+| Vị trí ứng tuyển | Frontend Developer |
+| Năm kinh nghiệm | 3 |
+| Kỹ năng chính | ReactJS, HTML, CSS |
+
+
+JSON:
+[
+  {
+    "name": "Nguyễn Văn A",
+    "phone": "0912345678",
+    "email": "a.nguyen@gmail.com",
+    "position": "Frontend Developer",
+    "experience_years": 3,
+    "skills": ["ReactJS", "HTML", "CSS"]
+  }
+]
+Ví dụ 2:
+Input: "nguyễn văn b ứng tuyển Data Scientist. Kỹ năng: Python, SQL. Email: b.nguyen@yahoo.com." 
+Output: 
+Markdown:
+| Trường thông tin | Giá trị |
+| --- | --- |
+| Họ tên | Nguyễn Văn B |
+| Số điện thoại | N/A |
+| Email | b.nguyen@yahoo.com |
+| Vị trí ứng tuyển | Data Scientist |
+| Năm kinh nghiệm | N/A |
+| Kỹ năng chính | Python, SQL |
+
+
+JSON:
+[
+  {
+    "name": "Nguyễn Văn B",
+    "phone": null,
+    "email": "b.nguyen@yahoo.com",
+    "position": "Data Scientist",
+    "experience_years": null,
+    "skills": ["Python", "SQL"]
+  }
+]
